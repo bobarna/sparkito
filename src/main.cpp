@@ -11,8 +11,7 @@ Color ray_color(const Ray& ray, const HittableList& world) {
     HitRecord hit;
     if(world.hit(ray, 0, INFINITY, hit)) {
         // we hit something -> render it
-        Vec3 N = hit.normal;
-        return 0.5 * Color(N.x()+1, N.y()+1, N.z()+1); // 0 < N < 1
+        return 0.5 * Color(hit.normal + Color(1,1,1)); // 0 < N < 1
     }
 
     // render sky if we didn't hit any objects
@@ -42,9 +41,9 @@ int main() {
     Point3 camera_center = Point3(0,0,0);
 
     // World (list of objects)
-    Point3 sphere_center = Point3(0,0,-1);
-    REAL sphere_radius = 0.5;
-    HittableList world(make_shared<Sphere>(sphere_center, sphere_radius));
+    HittableList world;
+    world.add(make_shared<Sphere>(Point3(0,0,-1), 0.5));
+    world.add(make_shared<Sphere>(Point3(0,-100.5,-1), 100));
 
     // Helper variables for handling the camera
     // vectors along the horizontal (u) and down the vertical (v) edges 
