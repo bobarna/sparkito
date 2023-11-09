@@ -1,27 +1,22 @@
 #include <iostream>
 
-#include "Math/MATH_DEFS.h"
+#include "Sparkito.h"
 #include "Math/Vec3.h"
 #include "Utils/Color.h"
 #include "Geometries/Ray.h"
+#include "Geometries/Sphere.h"
+#include "Geometries/HittableList.h"
 
-bool hit_sphere(const Point3& center, REAL radius, const Ray& ray) {
-    Vec3 co = ray.origin() - center;
-    Vec3 ray_dir = ray.direction();
-    // Solving the quadratic equation for determining intersection
-    // between the ray and the sphere
-    REAL a = dot(ray_dir, ray_dir);
-    REAL b = 2.0 * dot(co, ray_dir);
-    REAL c = dot(co, co) - radius*radius;
-    REAL discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
-}
+Color ray_color(const Ray& ray, const HittableList& world) {
+    HitRecord hit;
+    if(world.hit(ray, 0, INFINITY, hit)) {
+        // we hit something -> render it
+        Vec3 N = hit.normal;
+        return 0.5 * Color(N.x()+1, N.y()+1, N.z()+1); // 0 < N < 1
+    }
 
-Color ray_color(const Ray& r) {
-    if (hit_sphere(Point3(0,0,-1), 0.5, r))
-        return Color(1, 0, 0);
-
-    REAL y = unit_vector(r.direction()).y(); // -1.0 < y < 1.0
+    // render sky if we didn't hit any objects
+    REAL y = unit_vector(ray.direction()).y(); // -1.0 < y < 1.0
     REAL a = 0.5 * (y + 1.0); // 0.0 < a < 1.0
 
     Color white(1.0, 1.0, 1.0);
@@ -45,6 +40,11 @@ int main() {
     REAL viewport_width = viewport_height * 
         (static_cast<REAL>(image_width) / image_height);
     Point3 camera_center = Point3(0,0,0);
+
+    // World (list of objects)
+    Point3 sphere_center = Point3(0,0,-1);
+    REAL sphere_radius = 0.5;
+    HittableList world(make_shared<Sphere>(sphere_center, sphere_radius));
 
     // Helper variables for handling the camera
     // vectors along the horizontal (u) and down the vertical (v) edges 
@@ -77,7 +77,7 @@ int main() {
             Vec3 ray_direction = pixel_center - camera_center;
             Ray curr_ray(camera_center, ray_direction);
             
-            Color pixel_color = ray_color(curr_ray);
+            Color pixel_color = ray_color(curr_ray, world);
             write_color(std::cout, pixel_color);
         }
     }

@@ -1,7 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include "MATH_DEFS.h"
+#include "../Sparkito.h"
 
 class Vec3 {
     public:
