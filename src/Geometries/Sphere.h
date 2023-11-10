@@ -15,8 +15,7 @@ public:
         radius(_radius) {}
 
     bool hit(const Ray& ray, 
-             REAL tmin, 
-             REAL tmax, 
+             Interval ray_t,
              HitRecord& rec) const override {
         Vec3 co = ray.origin() - center;
         // Solving the quadratic equation for determining intersection
@@ -32,9 +31,9 @@ public:
         // find the nearest solution (root) that lies in the acceptable range
         REAL sqrtd = sqrt(discriminant);
         REAL t_hit = ( -half_b - sqrtd ) / a;
-        if (t_hit <= tmin || t_hit >= tmax) {
+        if (!ray_t.surrounds(t_hit)) {
             t_hit = ( -half_b - sqrtd ) / a;
-            if (t_hit <= tmin || t_hit >= tmax) 
+            if (!ray_t.surrounds(t_hit)) 
                 return false;
         }
 

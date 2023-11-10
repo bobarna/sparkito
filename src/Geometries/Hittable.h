@@ -1,7 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "Ray.h"
+#include "../Sparkito.h"
 
 struct HitRecord { 
     Point3 p; 
@@ -26,8 +26,7 @@ struct Hittable {
     virtual ~Hittable() = default;
 
     virtual bool hit(const Ray& ray, 
-                     REAL tmin, 
-                     REAL tmax, 
+                     Interval ray_t,
                      HitRecord& rec) const = 0;
 };
 
