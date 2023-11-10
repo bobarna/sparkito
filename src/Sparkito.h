@@ -27,6 +27,7 @@ inline REAL degrees_to_radians(REAL degrees) {
 }
 
 // Common Headers
+#include "Utils/Interval.h"
 #include "Math/Vec3.h"
 #include "Geometries/Ray.h"
 
