@@ -49,6 +49,18 @@ class Vec3 {
         REAL length_squared() const {
             return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
         }
+
+        static Vec3 get_random() {
+            return Vec3(random_real(), random_real(), random_real());
+        }
+
+        static Vec3 get_random(REAL min, REAL max) {
+            return Vec3(
+                random_real(min, max), 
+                random_real(min, max), 
+                random_real(min, max)
+            );
+        }
 };
 
 // Point3 is just an alias for Vec3; useful for clarity in the code.
@@ -99,6 +111,28 @@ inline Vec3 cross(const Vec3 &u, const Vec3 &v) {
 inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
 }
+
+inline Vec3 get_random_in_unit_sphere() {
+    while(true)  {
+        auto p = Vec3::get_random(-1, 1);
+        if(p.length_squared() < 1)
+            return p;
+    }
+}
+
+inline Vec3 get_random_unit_vector() {
+    return unit_vector(get_random_in_unit_sphere());
+}
+
+inline Vec3 get_random_on_hemisphere(const Vec3& normal) {
+    Vec3 on_unit_sphere = get_random_in_unit_sphere();
+    if(dot(on_unit_sphere, normal) > 0.0) 
+        // in the same hemisphere as the normal
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
+}
+
 
 #endif
 
