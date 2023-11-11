@@ -32,8 +32,18 @@ int main() {
     };
 
     add_sphere({ 0.0, -100.5, -1.0 }, 100, material_ground);
+    // Interesting & easy trick with dielectric spheres:
+    //  using negative radius, the geometry is unaffected, but the surface
+    //  normal points inward. We can use this as a "bubble" to make a hollow
+    //  glass sphere.
+    //Left Sphere
     add_sphere({-1.0,    0.0, -1.0 }, 0.5, material_glass);
+    add_sphere({-1.0,    0.0, -1.0 }, -0.4, material_glass);
+
+    //Center Sphere
     add_sphere({ 0.0,    0.0, -1.0 }, 0.5, material_blue);
+
+    //Right Sphere
     add_sphere({+1.0,    0.0, -1.0 }, 0.5, material_gold);
 
     // Image

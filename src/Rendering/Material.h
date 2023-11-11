@@ -81,6 +81,13 @@ public:
 class DielectricMaterial : public Material {
     // Dielectric material that always refracts
     REAL ior; // Index of Refraction; eta_incoming / eta_refracted
+
+    static double reflectance(REAL cosine, REAL ref_idx) {
+        // Use Schlick's approximation for reflectance.
+        auto r0 = (1-ref_idx) / (1+ref_idx);
+        r0 = r0*r0;
+        return r0 + (1-r0)*pow((1 - cosine), 5);
+    }
 public:
     DielectricMaterial(REAL _ior) 
         : ior(_ior) {}
@@ -102,7 +109,9 @@ public:
         REAL cannot_refract = refraction_ratio * sin_theta > 1.0;
         Vec3 out_dir;
 
-        if(cannot_refract)
+        if(cannot_refract 
+                || reflectance(cos_theta, refraction_ratio) > random_real()
+        )
             out_dir = reflect(in_dir, hit.normal);
         else
             out_dir = refract(in_dir, hit.normal, refraction_ratio);
