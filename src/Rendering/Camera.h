@@ -107,7 +107,12 @@ private:
 
         if(world.hit(ray, TO_INFINITY, hit)) {
             // we hit something -> render it
-            return 0.5 * Color(hit.normal + Color(1,1,1)); // 0 < N < 1
+            Vec3 bounce_dir = get_random_on_hemisphere(hit.normal);
+            // render normal color
+            //return 0.5 * Color(hit.normal + Color(1,1,1)); // 0 < N < 1
+            // simulate bounce
+            REAL albedo = 0.5;
+            return albedo * ray_color(Ray(hit.p, bounce_dir), world);
         }
 
         // render sky if we didn't hit any objects
