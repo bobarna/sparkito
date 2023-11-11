@@ -17,12 +17,15 @@
 
 class Camera {
 public:
-
     REAL aspect_ratio       = 1.0; // = image_width / image_height
     int image_width         = 100; // number of horizontal pixels
-    Point3 camera_center    = Point3(0,0,0);
+    Point3 camera_center    = Point3(0, 0, 0); // Point camera is looking from
+    Point3 lookat           = Point3(0, 0, -1); // Point camera is looking at
+    Point3 vup              = Vec3(0,1,0); // Camera-relative "up" direction 
     int samples_per_pixel   = 10; // Number of random samples for each pixel
     int max_depth           = 10; // Maximum number of ray bounces 
+
+    REAL vfov = 90; // Vertical view angle (Field of View)                              
 
     void render(const HittableList& world) {
         initialize();
@@ -51,9 +54,10 @@ private:
     REAL focal_length = 1.0;
     REAL viewport_height = 2.0;
     REAL viewport_width; 
-    Point3 pixel00_loc;
-    Vec3 pixel_delta_u;
-    Vec3 pixel_delta_v;
+    Point3 pixel00_loc; // Location of (center of) pixel 0,0 
+    Vec3 pixel_delta_u; // Offset to pixel to the right (and left)
+    Vec3 pixel_delta_v; // Offset to the pixel below (and above)
+    Vec3 u, v, w; // Camera frame basis vectors
 
     void initialize() {
         image_height = static_cast<int>(image_width / aspect_ratio);
@@ -61,13 +65,23 @@ private:
         image_height = (image_height < 1) ? 1 : image_height;
 
         // Determine viewport dimensions
-        viewport_width = viewport_height * 
-            (static_cast<REAL>(image_width) / image_height);
+        focal_length = (camera_center - lookat).length();
+        REAL theta = degrees_to_radians(vfov);
+        REAL h = tan(theta/2);
+        viewport_height = 2 * h * focal_length;
+        viewport_width = viewport_height * (REAL(image_width) / image_height);
 
-        // Helper variables for handling the camera
+        // Calculate {u,v,w} unit basis vectors for the camera coordinate frame
+        w = unit_vector(camera_center - lookat);
+        u = unit_vector(cross(vup, w));
+        v = cross(w, u);
+
         // vectors along the horizontal (u) and down the vertical (v) edges 
-        Vec3 viewport_u = Vec3(viewport_width, 0               , 0);
-        Vec3 viewport_v = Vec3(0             , -viewport_height, 0);
+        Vec3 viewport_u = viewport_width * u;  // Vector across viewport
+                                               // horizontal edge
+        Vec3 viewport_v = viewport_height * -v; // Vector down viewport
+                                                 // vertical edge
+
         // horizontal (u) and vertical (v) delta vectors from pixel to pixel
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
@@ -77,7 +91,12 @@ private:
                                     - Vec3(0, 0, focal_length)
                                     - viewport_u/2
                                     - viewport_v/2;
-        // we measure each pixel at the center of the grid elements
+    
+        // Calculate the location of the (center of the) upper left pixel.
+        viewport_upper_left = camera_center 
+                                        - (focal_length * w)
+                                        - viewport_u/2
+                                        - viewport_v/2;
         pixel00_loc = viewport_upper_left
                             + 0.5 * (pixel_delta_u + pixel_delta_v);
 

@@ -36,23 +36,23 @@ int main() {
     //  using negative radius, the geometry is unaffected, but the surface
     //  normal points inward. We can use this as a "bubble" to make a hollow
     //  glass sphere.
-    //Left Sphere
-    add_sphere({-1.0,    0.0, -1.0 }, 0.5, material_glass);
-    add_sphere({-1.0,    0.0, -1.0 }, -0.4, material_glass);
-
-    //Center Sphere
-    add_sphere({ 0.0,    0.0, -1.0 }, 0.5, material_blue);
-
-    //Right Sphere
-    add_sphere({+1.0,    0.0, -1.0 }, 0.5, material_gold);
+    add_sphere({-1.0,    0.0, -1.0 },  0.5, material_glass); // left
+    add_sphere({-1.0,    0.0, -1.0 }, -0.4, material_glass); // left (inner)
+    add_sphere({ 0.0,    0.0, -1.0 },  0.5, material_blue); // center
+    add_sphere({+1.0,    0.0, -1.0 },  0.5, material_gold); // right
 
     // Image
     Camera camera;
-    /* camera.camera_center        = Point3(0.0, 0.2, 0.2); */
     camera.aspect_ratio         = 16.0 / 9.0;
     camera.image_width          = 400;
-    camera.samples_per_pixel    = 100;
+    camera.samples_per_pixel    = 200;
     camera.max_depth            =  30;
+
+    camera.vfov             = 20;
+    //camera.camera_center        = Point3(0.0, 0.2, 0.2);
+    camera.camera_center    = Point3(-2, 2, 1);
+    camera.lookat           = Point3(0,0,-1);
+    camera.vup              = Vec3(0,1,0);
 
     // Render
     camera.render(world);
