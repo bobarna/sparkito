@@ -40,6 +40,7 @@ public:
         // "save out" HitRecord data
         rec.t = t_hit;
         rec.p = ray.at(rec.t);
+        // normalized via dividing by the radius
         Vec3 outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(ray, outward_normal);
 

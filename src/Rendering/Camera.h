@@ -17,10 +17,11 @@
 class Camera {
 public:
 
-    REAL aspect_ratio = 1.0; // = image_width / image_height
-    int image_width = 100; // number of horizontal pixels
-    Point3 camera_center = Point3(0,0,0);
-    int samples_per_pixel = 10;
+    REAL aspect_ratio       = 1.0; // = image_width / image_height
+    int image_width         = 100; // number of horizontal pixels
+    Point3 camera_center    = Point3(0,0,0);
+    int samples_per_pixel   = 10; // Number of random samples for each pixel
+    int max_depth           = 10; // Maximum number of ray bounces 
 
     void render(const HittableList& world) {
         initialize();
@@ -35,7 +36,7 @@ public:
                 Color pixel_color(0,0,0);
                 for(int sample = 0; sample < samples_per_pixel; ++sample) {
                     Ray r = get_ray(i,j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(std::cout, pixel_color, samples_per_pixel);
             }
@@ -102,17 +103,28 @@ private:
         return pixel_center + (px * pixel_delta_u) + (py * pixel_delta_v);
     }
 
-    Color ray_color(const Ray& ray, const HittableList& world) const { 
+    Color ray_color(const Ray& ray, 
+                    int depth, 
+                    const HittableList& world) const { 
         HitRecord hit;
 
-        if(world.hit(ray, TO_INFINITY, hit)) {
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if(depth <= 0) 
+            return Color(0,0,0);
+
+        if(world.hit(ray, EPS_TO_INFINITY, hit)) {
             // we hit something -> render it
-            Vec3 bounce_dir = get_random_on_hemisphere(hit.normal);
+            // Uniform sampling:
+            // Vec3 bounce_dir = get_random_on_hemisphere(hit.normal);
+            // True lambertian shading instead of simple hemisphere.
+            // (Scattering is more probable towards the surface normal)
+            Vec3 bounce_dir = hit.normal + get_random_unit_vector();
+            
             // render normal color
             //return 0.5 * Color(hit.normal + Color(1,1,1)); // 0 < N < 1
             // simulate bounce
             REAL albedo = 0.5;
-            return albedo * ray_color(Ray(hit.p, bounce_dir), world);
+            return albedo * ray_color( Ray(hit.p, bounce_dir), depth-1, world );
         }
 
         // render sky if we didn't hit any objects

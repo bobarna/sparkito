@@ -2,6 +2,7 @@
 #define INTERVAL_H
 
 #include "../Math/Vec3.h"
+#include "../Sparkito.h"
 
 struct Interval {
     REAL min;
@@ -38,6 +39,7 @@ struct Interval {
 const static Interval EMPTY;
 const static Interval EVERYTHING(-INFINITY, INFINITY);
 const static Interval TO_INFINITY(0, INFINITY);
+const static Interval EPS_TO_INFINITY(EPS, INFINITY);
 
 
 #endif //INTERVAL_H

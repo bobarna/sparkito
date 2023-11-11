@@ -21,6 +21,7 @@ using std::make_shared;
 #undef INFINITY //comes with <cmath>
 const REAL INFINITY = std::numeric_limits<REAL>::infinity();
 const REAL PI = 3.1415926535897932385;
+const REAL EPS = 0.001;
 
 // Utility functions
 
