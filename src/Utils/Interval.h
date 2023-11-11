@@ -1,6 +1,8 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "../Math/Vec3.h"
+
 struct Interval {
     REAL min;
     REAL max;
@@ -15,6 +17,22 @@ struct Interval {
     bool surrounds(REAL x) {
         return min < x && x < max;
     }
+
+    REAL clamp(REAL x) const {
+        if(x < min) return min;
+        if(x > max) return max;
+        return x;
+    }
+
+    Vec3& clamp(Vec3& v) const {
+        for(int i = 0; i < 3; ++i) {
+            if(v[i] < min) v[i] = min;
+            if(v[i] > max) v[i] = max;
+        }
+
+        return v;
+    }
+
 };
 
 const static Interval EMPTY;

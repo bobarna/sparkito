@@ -14,6 +14,14 @@ class Vec3 {
         REAL y() const { return e[1]; }
         REAL z() const { return e[2]; }
 
+        REAL r() const { return e[0]; }
+        REAL g() const { return e[1]; }
+        REAL b() const { return e[2]; }
+
+        REAL u() const { return e[0]; }
+        REAL v() const { return e[1]; }
+        REAL w() const { return e[2]; }
+
         Vec3 operator-() const { return Vec3(-e[0], -e[1], -e[2]); }
         
         REAL operator[](int i) const { return e[i]; }

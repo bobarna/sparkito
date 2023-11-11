@@ -20,6 +20,7 @@ public:
     REAL aspect_ratio = 1.0; // = image_width / image_height
     int image_width = 100; // number of horizontal pixels
     Point3 camera_center = Point3(0,0,0);
+    int samples_per_pixel = 10;
 
     void render(const HittableList& world) {
         initialize();
@@ -30,14 +31,13 @@ public:
             std::clog << "\rScanlines remaining: " 
                       << (image_height - j) << " " << std::flush;
             for(int i = 0; i < image_width; ++i){
-                Vec3 pixel_center = pixel00_loc 
-                                    + (i * pixel_delta_u)
-                                    + (j * pixel_delta_v);
-                Vec3 ray_direction = pixel_center - camera_center;
-                Ray curr_ray(camera_center, ray_direction);
-                
-                Color pixel_color = ray_color(curr_ray, world);
-                write_color(std::cout, pixel_color);
+                // Sample multiple rays per pixel
+                Color pixel_color(0,0,0);
+                for(int sample = 0; sample < samples_per_pixel; ++sample) {
+                    Ray r = get_ray(i,j);
+                    pixel_color += ray_color(r, world);
+                }
+                write_color(std::cout, pixel_color, samples_per_pixel);
             }
         }
 
@@ -79,6 +79,27 @@ private:
         pixel00_loc = viewport_upper_left
                             + 0.5 * (pixel_delta_u + pixel_delta_v);
 
+    }
+
+    Ray get_ray(int i, int j) const {
+        // Get a randomly sampled camera ray for the pixel at location (i, j)
+        Vec3 pixel_center = pixel00_loc 
+                            + (i * pixel_delta_u)
+                            + (j * pixel_delta_v);
+
+        // get random ray in the pixel to be sampled
+        Vec3 pixel_sample = pixel_sample_square(pixel_center);
+        Vec3 ray_direction = pixel_sample - camera_center;
+
+        return Ray(camera_center, ray_direction);
+    }
+
+    // TODO experimenting with sampling on a disk instead?
+    Vec3 pixel_sample_square(const Vec3 pixel_center) const {
+        // Returns a random point in the pixel surrounding pixel_center
+        REAL px = -0.5 + random_real(); 
+        REAL py = -0.5 + random_real(); 
+        return pixel_center + (px * pixel_delta_u) + (py * pixel_delta_v);
     }
 
     Color ray_color(const Ray& ray, const HittableList& world) const { 

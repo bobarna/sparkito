@@ -24,7 +24,7 @@ $(BUILD_NAME): $(OBJECTS)
 
 # Rule for compiling source files to object files
 # Each object file depends on the corresponding source file
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp 
 	$(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
 .PHONY: clean
