@@ -4,6 +4,7 @@
 #include "../Sparkito.h"
 #include "../Utils/Color.h"
 #include "../Geometries/Hittable.h"
+#include "Material.h"
 
 #include <iostream>
 
@@ -118,13 +119,14 @@ private:
             // Vec3 bounce_dir = get_random_on_hemisphere(hit.normal);
             // True lambertian shading instead of simple hemisphere.
             // (Scattering is more probable towards the surface normal)
-            Vec3 bounce_dir = hit.normal + get_random_unit_vector();
-            
-            // render normal color
-            //return 0.5 * Color(hit.normal + Color(1,1,1)); // 0 < N < 1
-            // simulate bounce
-            REAL albedo = 0.5;
-            return albedo * ray_color( Ray(hit.p, bounce_dir), depth-1, world );
+            // Vec3 bounce_dir = hit.normal + get_random_unit_vector();
+
+            Ray scattered;
+            Color attenuation;
+            if(hit.material->scatter(ray, hit, attenuation, scattered))
+                return attenuation * ray_color(scattered, depth-1, world);
+
+            return Color(0,0,0);
         }
 
         // render sky if we didn't hit any objects

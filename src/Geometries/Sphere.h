@@ -1,18 +1,23 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "Hittable.h"
 #include "../Sparkito.h"
+
+#include "Hittable.h"
+#include "../Rendering/Material.h"
 
 class Sphere : public Hittable {
     Point3 center;
     REAL radius;
+    shared_ptr<Material> material;
 public:
     Sphere(
         Point3 _center, 
-        REAL _radius
+        REAL _radius,
+        shared_ptr<Material> _material
     ) : center(_center), 
-        radius(_radius) {}
+        radius(_radius),
+        material(_material) {}
 
     bool hit(const Ray& ray, 
              Interval ray_t,
@@ -43,6 +48,7 @@ public:
         // normalized via dividing by the radius
         Vec3 outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(ray, outward_normal);
+        rec.material = material;
 
         return true;
     }

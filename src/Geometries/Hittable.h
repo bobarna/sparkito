@@ -3,9 +3,14 @@
 
 #include "../Sparkito.h"
 
+// Resolve circular dependendencies, 
+// (We're using only a pointer to Material)
+class Material;
+
 struct HitRecord { 
     Point3 p; 
     Vec3 normal; 
+    shared_ptr<Material> material;
     REAL t; 
     bool front_face;
 
