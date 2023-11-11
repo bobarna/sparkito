@@ -76,6 +76,40 @@ public:
 
         return !fuzzed_below_surface;
     }
+};
+
+class DielectricMaterial : public Material {
+    // Dielectric material that always refracts
+    REAL ior; // Index of Refraction; eta_incoming / eta_refracted
+public:
+    DielectricMaterial(REAL _ior) 
+        : ior(_ior) {}
+
+    bool scatter(
+        const Ray& ray_in,
+        const HitRecord& hit,
+        Color& attenuation,
+        Ray& scattered
+    ) const override {
+        // don't change color
+        attenuation = Color(1.0, 1.0, 1.0);
+        REAL refraction_ratio = hit.front_face ? (1.0/ior) : ior;
+        
+        Vec3 in_dir = unit_vector(ray_in.direction());
+        REAL cos_theta = fmin(dot(-in_dir, hit.normal), 1.0);
+        REAL sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+
+        REAL cannot_refract = refraction_ratio * sin_theta > 1.0;
+        Vec3 out_dir;
+
+        if(cannot_refract)
+            out_dir = reflect(in_dir, hit.normal);
+        else
+            out_dir = refract(in_dir, hit.normal, refraction_ratio);
+
+        scattered = Ray(hit.p, out_dir);
+        return true;
+    }
 
 };
 

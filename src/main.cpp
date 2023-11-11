@@ -17,23 +17,24 @@ int main() {
     );
     auto material_red = make_shared<LambertianMaterial>(
             Color(0.7, 0.3, 0.3));
+    auto material_blue = make_shared<LambertianMaterial>(
+            Color(0.1, 0.3, 0.7));
     auto material_mirror = make_shared<MetalMaterial>(
             Color(0.8, 0.8, 0.8));
     auto material_gold = make_shared<MetalMaterial>(
             Color(0.8, 0.6, 0.3), 0.5);
+    auto material_glass = make_shared<DielectricMaterial>(1.5);
 
-    world.add(
-        make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100, material_ground)
-    );
-    world.add(
-        make_shared<Sphere>(Point3( 0.0,    0.0, -1.0), 0.5, material_red)
-    );
-    world.add(
-        make_shared<Sphere>(Point3(-1.0,    0.0, -1.0), 0.5, material_mirror)
-    );
-    world.add(
-        make_shared<Sphere>(Point3( 1.0,    0.0, -1.0), 0.5, material_gold)
-    );
+    // helper lambda to add a sphere to the world
+    auto add_sphere = 
+        [&world](Point3 center, REAL radius, shared_ptr<Material> material){
+            world.add(make_shared<Sphere>(center, radius, material));
+    };
+
+    add_sphere({ 0.0, -100.5, -1.0 }, 100, material_ground);
+    add_sphere({-1.0,    0.0, -1.0 }, 0.5, material_glass);
+    add_sphere({ 0.0,    0.0, -1.0 }, 0.5, material_blue);
+    add_sphere({+1.0,    0.0, -1.0 }, 0.5, material_gold);
 
     // Image
     Camera camera;
