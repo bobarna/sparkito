@@ -35,10 +35,12 @@ public:
         initialize();
 
         std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
-
+        
+        #pragma omp parallel
         for(int j = 0; j < image_height; ++j){
             std::clog << "\rScanlines remaining: " 
                       << (image_height - j) << " " << std::flush;
+            #pragma omp parallel
             for(int i = 0; i < image_width; ++i){
                 // Sample multiple rays per pixel
                 Color pixel_color(0,0,0);
