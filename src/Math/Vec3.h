@@ -122,6 +122,14 @@ inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
 }
 
+inline Vec3 random_in_unit_disk() {
+    while(true) {
+        Vec3 p = Vec3(random_real(-1,1), random_real(-1,1), 0);
+        if(p.length_squared() < 1)
+            return p;
+    }
+}
+
 inline Vec3 get_random_in_unit_sphere() {
     while(true)  {
         auto p = Vec3::get_random(-1, 1);
